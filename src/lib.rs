@@ -1,40 +1,16 @@
-use error_code::ErrorCode;
-use login::{LoginParameters, LoginRawResponse, LoginResult};
-use std::{error, fmt::Display};
-use thiserror::Error;
-
 mod data_types;
-mod endpoint;
 mod error_code;
+mod errors;
 mod login;
 
+use login::LoginRawResponse;
+
+pub use data_types::*;
+pub use error_code::ErrorCode;
+pub use errors::{ApiException, UsgsError};
+pub use login::{LoginParameters, LoginResult};
+
 const API_URL: &'static str = "https://m2m.cr.usgs.gov/api/api/json/";
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ApiException {
-    pub code: ErrorCode,
-    pub message: String,
-}
-
-impl Display for ApiException {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}: {}", self.code, self.message)
-    }
-}
-
-impl error::Error for ApiException {
-    fn description(&self) -> &str {
-        &self.message
-    }
-}
-
-#[derive(Debug, Error)]
-pub enum UsgsError {
-    #[error("{0}")]
-    ApiException(#[from] ApiException),
-    #[error("{0}")]
-    Http(#[from] reqwest::Error),
-}
 
 pub struct Usgs {
     url: String,
@@ -95,14 +71,5 @@ impl From<ApiVersion> for &'static str {
             ApiVersion::Experimental => "experimental",
             ApiVersion::Stable => "stable",
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
     }
 }
