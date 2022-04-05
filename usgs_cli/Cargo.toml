@@ -1,0 +1,7 @@
+[package]
+name = "usgs_cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+usgs_api = { path = "../usgs_api" }
